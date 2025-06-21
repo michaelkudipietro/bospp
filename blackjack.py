@@ -144,5 +144,18 @@ random.shuffle(deck)
 return deck
 
 def displayHands(playerHand,dealerHand,showDealerHand):
-'''Show the player's and dealers cards. Hide the dealer's first card if showDealerHand is False'''
-#START HERE
+    '''Show the player's and dealers cards. Hide the dealer's first card if showDealerHand is False'''
+    print()
+    if showDealerHand():
+        print('DEALER:', getHandValue(dealerHand))
+        displayCards(dealerHand)
+    else:
+        print('DEALER: ???')
+        #hide the dealer's first card
+        displayCards([BACKSIDE] + dealerHand[1:])
+
+    print('PLAYER:',getHandValue(playerHand))
+    displayCards(playerHand)
+
+
+    #Start here after merging with github main branch - use git from terminal going forward
