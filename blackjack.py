@@ -54,6 +54,8 @@ def main():
         while True: #Keep looping until player stands or busts
             displayHands(playerHand,dealerHand, False)
             print()
+            
+            
 
             #Check if the player has bust
             if getHandValue(playerHand)>21:
@@ -61,6 +63,7 @@ def main():
             
             #get player's move, either H, S, or D
             move = getMove(playerHand, money - bet)
+            doubleDown = False
 
             #Handle the player actions:
             if move == 'D':
@@ -69,6 +72,7 @@ def main():
                 bet+=additionalBet
                 print('Bet increased to {}.'.format(bet))
                 print('Bet:',bet)
+                doubleDown=True
 
             if move in ('H','D'):
                 #Hit/doubling down, takes another card
@@ -78,45 +82,48 @@ def main():
                 playerHand.append(newCard)
 
                 if getHandValue(playerHand)>21:
-                    #The player has busted:
-                    continue
+                    displayHands(playerHand, dealerHand, True)#The player has busted:
+                    print('You busted! You lose ${}'.format(bet))
+                    money-=bet
+                    input('Press Enter to continue...')
+                    print('\n\n')
+                    break
             if move in ('S','D'):
                 #Stand/doubling down stops the player's turn.
                 break
 
             #Handle the dealer's actions
         if getHandValue(playerHand) <=21:
-            while getHandValue(playerHand) <17:
+            while getHandValue(dealerHand) <17:
                 #The dealer hit:
                 print('Dealer hits...')
                 dealerHand.append(deck.pop())
                 displayHands(playerHand,dealerHand,False)
-
                 if getHandValue(dealerHand) > 21:
                     break #dealer has busted
                 input('Press Enter to continue')
                 print('\n\n')
 
-                #Show the final hands:
-                displayHands(playerHand, dealerHand, True)
+            #Show the final hands:
+            displayHands(playerHand, dealerHand, True)
 
-                playerValue = getHandValue(playerHand)
-                dealerValue = getHandValue(dealerHand)
-                #handle whether the player won, lost, or tied
-                if  dealerValue > 21:
-                    print('Dealer busts! You win ${}!'.format(bet))
-                    money+=bet
-                elif(playerValue > 21) or (playerValue < dealerValue):
-                    print('You lost!')
-                    money -=bet
-                elif(playerValue > dealerValue):
-                    print('You won ${}!'.format(bet))
-                    money+=bet
-                elif playerValue == dealerValue:
-                    print('It\s a tie, your bet is returned to you.')
+        playerValue = getHandValue(playerHand)
+        dealerValue = getHandValue(dealerHand)
+        #handle whether the player won, lost, or tied
+        if  dealerValue > 21:
+            print('Dealer busts! You win ${}!'.format(bet))
+            money+=bet
+        elif(playerValue > 21) or (playerValue < dealerValue):
+            print('You lost!')
+            money -=bet
+        elif(playerValue > dealerValue):
+            print('You won ${}!'.format(bet))
+            money+=bet
+        elif playerValue == dealerValue:
+            print("It's a tie, your bet is returned to you.")
 
-                input('Press Enter to continue...')
-                print('\n\n')
+        input('Press Enter to continue...')
+        print('\n\n')
 
 def getBet(maxBet):
     '''Ask the player how much they want to bet for this round.'''
@@ -183,25 +190,21 @@ def getHandValue(cards):
 
 def displayCards(cards):
     '''Display all the cards in the cards list'''
-    rows = ['','','','',''] #The text to display on each row
+    rows = ['', '', '', '', '']  # Top, three body rows, and bottom border
 
-    for i, card in enumerate(cards):
-        rows[0] +='__' #print the top lne of the card
+    for card in cards:
+        rows[0] += ' ___  '  # Top of the card
         if card == BACKSIDE:
-            #Print the card's back
-            rows[1] +='|## |'
-            rows[2] +='|###|'
-            rows[3] +='|_##|'
+            rows[1] += '|## | '
+            rows[2] += '|###| '
+            rows[3] += '|_##| '
         else:
-            #Print the card's front:
-            rank, suit = card #the card is a tuple data structure
+            rank, suit = card
+            rows[1] += f'|{rank.ljust(2)} | '
+            rows[2] += f'| {suit} | '
+            rows[3] += f'|_{rank.rjust(2, "_")}| '
 
-            rows[1] +='|{}  |'.format(rank.ljust(2))
-            rows[2] +='| {} |'.format(suit)
-            rows[3] +='|  {}|'.format(rank.rjust(2,'_'))
-
-    #print each row on screen
-    for row in rows:
+    for row in rows[:4]:  # Only need first 4 rows; fifth is unused
         print(row)
 
 def getMove(playerHand,money):
