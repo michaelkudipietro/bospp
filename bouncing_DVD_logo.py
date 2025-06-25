@@ -21,10 +21,10 @@ WIDTH,HEIGHT = bext.size()
 #We can't print to the last column on Windows without it adding a newline automatically, so reduce the width by 1
 WIDTH -= 1
 
-NUMBER_OF_LOGOS= 5 #range of 1 to 100
-PAUSE_AMOUNT=0.2 #range of 0.0 to 1.0
+NUMBER_OF_LOGOS= 20 #range of 1 to 100
+PAUSE_AMOUNT=0.5 #range of 0.0 to 1.0
 
-COLORS= ['red','green','yelllow','blue','magenta','cyan','white']
+COLORS= ['red','green','yellow','blue','magenta','cyan','white']
 
 UP_RIGHT ='ur'
 UP_LEFT ='ul'
@@ -59,7 +59,7 @@ def main():
         for logo in logos: #handle each logo in the logos list
             #Erase the logo's current location
             bext.goto(logo[X],logo[Y])
-            print('  ',end='') #try commenting this line out later?
+            print('   ',end='') #try commenting this line out later?
 
             originalDirection=logo[DIR]
 
@@ -106,6 +106,32 @@ def main():
                 #change the color when the logo bounces
                 logo[COLOR]=random.choice(COLORS)
 
+            # Bounce if next Y would go out of bounds
+            if logo[DIR] in (UP_RIGHT, UP_LEFT) and logo[Y] <= 0:
+                if logo[DIR] == UP_RIGHT:
+                    logo[DIR] = DOWN_RIGHT
+                elif logo[DIR] == UP_LEFT:
+                    logo[DIR] = DOWN_LEFT
+
+            # Bounce if about to go off screen horizontally
+            if logo[DIR] in (UP_RIGHT, DOWN_RIGHT) and logo[X] >= WIDTH - 3:
+                if logo[DIR] == UP_RIGHT:
+                    logo[DIR] = UP_LEFT
+                elif logo[DIR] == DOWN_RIGHT:
+                    logo[DIR] = DOWN_LEFT
+
+            elif logo[DIR] in (UP_LEFT, DOWN_LEFT) and logo[X] <= 0:
+                if logo[DIR] == UP_LEFT:
+                    logo[DIR] = UP_RIGHT
+                elif logo[DIR] == DOWN_LEFT:
+                    logo[DIR] = DOWN_RIGHT
+
+
+            elif logo[DIR] in (DOWN_RIGHT, DOWN_LEFT) and logo[Y] >= HEIGHT - 2:
+                if logo[DIR] == DOWN_RIGHT:
+                    logo[DIR] = UP_RIGHT
+                elif logo[DIR] == DOWN_LEFT:
+                    logo[DIR] = UP_LEFT
             #move the logo (X moves by 2 because the terminal
             #characters are twice as tall as they are wide)
             if logo[DIR] == UP_RIGHT:
